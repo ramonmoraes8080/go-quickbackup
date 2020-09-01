@@ -16,11 +16,11 @@ limitations under the License.
 package config
 
 import (
-	"fmt"
+	// "fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 
-	"gitlab.com/velvetkeyboard/go-backup/utils"
+	"gitlab.com/velvetkeyboard/go-quickbackup/utils"
 )
 
 type ConfigurationBackend struct {

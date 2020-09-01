@@ -19,8 +19,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"gitlab.com/velvetkeyboard/go-backup/config"
-	"gitlab.com/velvetkeyboard/go-backup/utils"
+	"gitlab.com/velvetkeyboard/go-quickbackup/config"
+	"gitlab.com/velvetkeyboard/go-quickbackup/utils"
 )
 
 type Schema struct {

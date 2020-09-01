@@ -1,4 +1,4 @@
-module gitlab.com/velvetkeyboard/go-backup
+module gitlab.com/velvetkeyboard/go-quickbackup
 
 go 1.15
 

@@ -25,8 +25,8 @@ import (
 )
 
 const (
-	APP_NAME        = "quickbackups"
-	APP_CONFIG_PATH = "~/.quickbackups.yaml"
+	APP_NAME        = "quickbackup"
+	APP_CONFIG_PATH = "~/.quickbackup.yaml"
 )
 
 var cfgFile string
@@ -89,7 +89,7 @@ func initConfig() {
 
 		// Search config in home directory with name ".go-backup" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".quickbackups")
+		viper.SetConfigName(".quickbackup")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

@@ -22,11 +22,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"gitlab.com/velvetkeyboard/go-backup/backends"
-	"gitlab.com/velvetkeyboard/go-backup/config"
-	"gitlab.com/velvetkeyboard/go-backup/schema"
-	"gitlab.com/velvetkeyboard/go-backup/utils"
-	"gitlab.com/velvetkeyboard/go-backup/zipfile"
+	"gitlab.com/velvetkeyboard/go-quickbackup/backends"
+	"gitlab.com/velvetkeyboard/go-quickbackup/config"
+	"gitlab.com/velvetkeyboard/go-quickbackup/schema"
+	"gitlab.com/velvetkeyboard/go-quickbackup/utils"
+	"gitlab.com/velvetkeyboard/go-quickbackup/zipfile"
 )
 
 // uploadCmd represents the upload command
@@ -69,7 +69,7 @@ var uploadCmd = &cobra.Command{
 
 		// TODO Might be interesting creating the backup on the /tmp
 		currTimeStr := utils.GetCurrentISOTimeString()
-		zipFileTitle := "quickbackups-" + schemaName + "-" + currTimeStr
+		zipFileTitle := "quickbackup-" + schemaName + "-" + currTimeStr
 		zipFileNameFull := zipFileTitle + ".zip"
 
 		zfile := new(zipfile.ZipFile)

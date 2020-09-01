@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "gitlab.com/velvetkeyboard/go-backup/cmd"
+import "gitlab.com/velvetkeyboard/go-quickbackup/cmd"
 
 func main() {
 	cmd.Execute()
