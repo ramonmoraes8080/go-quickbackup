@@ -1,4 +1,4 @@
-# Backup
+# quickbackup
 
 CLI that backup a list of files and folders into a .zip file and upload it
 somewhere using YAML based configuration
@@ -7,7 +7,7 @@ somewhere using YAML based configuration
 
 ## Usage
 
-Base YAML config for the examples saved at `~/.backup.yaml`:
+Base YAML config for the examples saved at `~/.quickbackup.yaml`:
 
 ```
 defaults:
@@ -41,21 +41,22 @@ schemas:
     - /etc/bashrc
 ```
 
-- Backing up config files to `~/backups`
+- Backing up config files (`my_configs` schema) to `~/backups` folder
 
-`backup` or `backup -s my_configs -to my_backups`
+`quickbackup upload -s my_configs -l my_backups`
 
-- Backing up config files to the pendrive at `/run/media/johnnymnemonic/my-pendrive/`
+- Backing up config files (`my_configs` schema) to the pendrive at `/run/media/johnnymnemonic/my-pendrive/`
 
-`backup -to pendrive` or `backup -s my_configs -to pendrive`
+`quickbackup upload -s my_configs -l pendrive`
 
-- Backing up etc files to the pendrive at `/run/media/johnnymnemonic/my-pendrive/`
+- Backing up etc files (`my_etc` schema) to the pendrive at `/run/media/johnnymnemonic/my-pendrive/`
 
-`backup -s my_etc -to pendrive`
+`quickbackup upload -s my_etc -l pendrive`
 
-- Backing up config files to the pendrive at `/run/media/johnnymnemonic/my-pendrive/`
+Since we defined the `defaults` section we can perform the back of the
+`my_config` to the `~/backups` folder using only:
 
-`backup -to pendrive` or `backup -s my_configs -to pendrive`
+`quickbackup upload`
 
 ## Backends
 
