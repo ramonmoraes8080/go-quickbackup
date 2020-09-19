@@ -16,9 +16,10 @@ limitations under the License.
 package config
 
 import (
-	// "fmt"
+	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"errors"
 
 	"gitlab.com/velvetkeyboard/go-quickbackup/utils"
 )
@@ -61,4 +62,19 @@ func (c *Configuration) GetDefaultLocationName() string {
 
 func (c *Configuration) GetDefaultSchemaName() string {
 	return c.Defaults.Schema
+}
+
+// We will run some verification routines on the given location name:
+// - It it mapped on the config file?
+// - Does the Engine associated is currentry supported?
+func (c *Configuration) CheckLocationStatus(locationName string) (bool, error) {
+	if c.Locations[locationName].Backend == "" {
+		return false, errors.New(fmt.Sprintf(
+			"backend is not defined for location \"%s\"", locationName))
+	}
+	if c.Locations[locationName].Path == "" {
+		return false, errors.New(fmt.Sprintf(
+			"path is not defined for location \"%s\"", locationName))
+	}
+	return true, nil
 }
