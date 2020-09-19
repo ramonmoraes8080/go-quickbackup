@@ -22,7 +22,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"gitlab.com/velvetkeyboard/go-quickbackup/backends"
+	googledrive "gitlab.com/velvetkeyboard/go-quickbackup/backends/googledrive"
+	local "gitlab.com/velvetkeyboard/go-quickbackup/backends/local"
 	"gitlab.com/velvetkeyboard/go-quickbackup/config"
 	"gitlab.com/velvetkeyboard/go-quickbackup/schema"
 	"gitlab.com/velvetkeyboard/go-quickbackup/utils"
@@ -39,12 +40,10 @@ var uploadCmd = &cobra.Command{
 		locationName, _ := cmd.Flags().GetString("location")
 		configFilePath, _ := cmd.Flags().GetString("config")
 
-		if configFilePath == "" {
-			utils.LoggerError("file path for configuration is not present")
+		if _, err := utils.CheckFilePath(configFilePath); err != nil {
+			utils.LoggerError(err.Error())
 			os.Exit(0)
 		}
-
-		// TODO check if the file exists
 
 		config := new(config.Configuration)
 		config.Init(configFilePath)
@@ -56,6 +55,14 @@ var uploadCmd = &cobra.Command{
 
 		if locationName == "" {
 			locationName = config.GetDefaultLocationName()
+		}
+
+		// Check if Location Name and the Backend Engine associated with it
+		// exists
+
+		if _, err := config.CheckLocationStatus(locationName); err != nil {
+			utils.LoggerError(err.Error())
+			os.Exit(0)
 		}
 
 		utils.LoggerInfo(fmt.Sprintf(
@@ -91,6 +98,9 @@ var uploadCmd = &cobra.Command{
 			backend := new(local.BackendLocalFilesystem)
 			backend.Init(location.Path)
 			backend.Upload(zipFileNameFull)
+		case "googledrive":
+			backend := new(googledrive.BackendGoogleDrive)
+			backend.Init(location.Path)
 		default:
 			utils.LoggerError(fmt.Sprintf(
 				"Backend \"%s\" is not implemented yet :'(",
