@@ -53,18 +53,27 @@ schemas:
 
 `quickbackup upload -s my_etc -l pendrive`
 
-Since we defined the `defaults` section we can perform the back of the
+- Since we defined the `defaults` section we can perform the back of the
 `my_config` to the `~/backups` folder using only:
 
 `quickbackup upload`
 
+- List all the backups for `fedora` schema uploaded with `my_backups`
+
+`quickbackup list -s fedora -l my_backups`
+
+- Downloading/Recovering backups
+
+`quickbackup download -s fedora -l my_backups`
+
+
 ## Backends
 
-| Name             | Upload | Download  | List |
-|------------------|--------|-----------|------|
-| Local Filesystem |    X   |           |      |
-| Google Drive     |        |           |      |
-| AWS S3           |        |           |      |
+| Name             | Upload      | Download    | List        |
+|------------------|-------------|-------------|-------------|
+| Local Filesystem | Implemented | Implemented | Implemented |
+| Google Drive     | Not Yet     | Not Yet     | Not Yet     |
+| AWS S3           | Not Yet     | Not Yet     | Not Yet     |
 
 ## License
 

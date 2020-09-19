@@ -5,4 +5,4 @@ build:
 	go build -o backup main.go 
 
 install: build
-	cp backup $(local_bin)/backup
+	cp -f backup $(local_bin)/backup
