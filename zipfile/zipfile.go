@@ -45,31 +45,30 @@ func (zf *ZipFile) AppendBytes(fileName string, fileContent []byte) {
 	ioWriter, err := zf.ZipWriter.Create(fileName)
 
 	if err != nil {
-		// ioWriter.Close()
-		panic(err)
+		panic(err) // TODO do we really want to panic?
 	}
 
 	_, err = ioWriter.Write(fileContent)
 
 	if err != nil {
-		// ioWriter.Close()
-		panic(err)
+		panic(err) // TODO do we really want to panic?
 	}
 }
 
 func (zf *ZipFile) Save() {
 	zf.ZipWriter.Close()
+
 	osZipFile, err := os.Create(zf.FilePath)
 
 	if err != nil {
 		panic(err) // TODO do we really want to panic?
 	}
 
+	defer osZipFile.Close()
+
 	_, err = osZipFile.Write(zf.Buffer.Bytes())
 
 	if err != nil {
 		panic(err) // TODO do we really want to panic?
 	}
-
-	osZipFile.Close()
 }
