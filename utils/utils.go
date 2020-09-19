@@ -16,8 +16,11 @@ limitations under the License.
 package utils
 
 import (
+	"errors"
 	"fmt"
+	"io"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -63,4 +66,99 @@ func ExpandUser(path string) string {
 func GetCurrentISOTimeString() string {
 	currTime := time.Now()
 	return currTime.Format("2006-01-02-150405")
+}
+
+func CheckFilePath(path string) (bool, error) {
+	path = ExpandUser(path)
+	if path == "" {
+		return false, errors.New("Path is empty")
+	} else {
+		_, err := os.Stat(path)
+		if err != nil {
+			return false, errors.New(fmt.Sprintf(
+				"File %s does not exist", path))
+		}
+	}
+	return true, nil
+}
+
+// We pass a folder path and return a array of strings including all the
+// relative file paths to it
+func WalkDir(dirPath string) []string {
+	var paths []string
+
+	err := filepath.Walk(
+		dirPath,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			paths = append(paths, path)
+			return nil
+		},
+	)
+
+	if err != nil {
+		return []string{}
+	}
+
+	return paths
+}
+
+// We pass a list of files and folders as an array of strings and return a new
+// array where the folder paths are expanded by call for WalkDir function
+func WalkDirs(schemaFilePaths []string) []string {
+	var ret []string
+	for _, path := range schemaFilePaths {
+		path := ExpandUser(path)
+
+		f, err := os.Stat(path)
+		// TODO Should we be using CheckFilePath here?
+
+		if err != nil {
+			// Doesn't exist? That's Ok. Move on to the next file path
+			continue
+		}
+
+		switch mode := f.Mode(); {
+		case mode.IsDir():
+			ret = append(ret, WalkDir(path)...)
+		case mode.IsRegular():
+			ret = append(ret, path)
+		}
+	}
+	return ret
+}
+
+func ReadInputInt(template string) int {
+	var ret int
+	print(template)
+	fmt.Scanf("%d", &ret)
+	return ret
+}
+
+// Source: https://opensource.com/article/18/6/copying-files-go
+func Copy(src string, dst string) (int64, error) {
+	sourceFileStat, err := os.Stat(src)
+	if err != nil {
+		return 0, err
+	}
+
+	if !sourceFileStat.Mode().IsRegular() {
+		return 0, fmt.Errorf("%s is not a regular file", src)
+	}
+
+	source, err := os.Open(src)
+	if err != nil {
+		return 0, err
+	}
+	defer source.Close()
+
+	destination, err := os.Create(dst)
+	if err != nil {
+		return 0, err
+	}
+	defer destination.Close()
+	nBytes, err := io.Copy(destination, source)
+	return nBytes, err
 }
