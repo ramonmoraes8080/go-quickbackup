@@ -100,7 +100,7 @@ var uploadCmd = &cobra.Command{
 			backend.Upload(zipFileNameFull)
 		case "googledrive":
 			backend := new(googledrive.BackendGoogleDrive)
-			backend.Init(location.Path)
+			backend.Init(location.Path, "")
 		default:
 			utils.LoggerError(fmt.Sprintf(
 				"Backend \"%s\" is not implemented yet :'(",
