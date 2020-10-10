@@ -16,10 +16,10 @@ limitations under the License.
 package config
 
 import (
+	"errors"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"errors"
 
 	"gitlab.com/velvetkeyboard/go-quickbackup/utils"
 )
@@ -39,8 +39,9 @@ type ConfigurationLocation struct {
 }
 
 type Configuration struct {
-	Defaults  ConfigurationDefaults            `yaml:",flow"`
-	Backends  map[interface{}]interface{}      // `yaml:",flow"`
+	Defaults ConfigurationDefaults `yaml:",flow"`
+	// Backends  map[interface{}]interface{}      // `yaml:",flow"`
+	Backends  map[string]interface{}           `yaml:",flow"`
 	Locations map[string]ConfigurationLocation `yaml:",flow"`
 	Schemas   map[string][]string
 }
@@ -48,7 +49,8 @@ type Configuration struct {
 func (c *Configuration) Init(filePath string) {
 	filePath = utils.ExpandUser(filePath)
 	fileBytes, _ := ioutil.ReadFile(filePath)
-	c.Backends = make(map[interface{}]interface{})
+	// c.Backends = make(map[interface{}]interface{})
+	// c.Backends = make(map[string]interface{})
 	err := yaml.Unmarshal(fileBytes, &c)
 	if err != nil {
 		panic(err)
