@@ -72,26 +72,40 @@ to quickly create a Cobra application.`,
 			schemaName,
 			locationName,
 		))
+
 		location := config.Locations[locationName]
 
+		var backendConfig map[interface{}]interface{}
+		if "filesystem" != location.Backend {
+			// Go is not clever enough to resolve this one for me...
+			backendConfig = config.Backends[location.Backend].(map[interface{}]interface{})
+		}
+
+		// Resolving backend and Acquiring data through it
 		// TODO Add AWS S3 Backend
-		// TODO Add Google Drive Backend
+		var fileNamesLen int
+		var fileNames []string
 		switch location.Backend {
 		case "filesystem":
 			backend := new(local.BackendLocalFilesystem)
 			backend.Init(location.Path)
-			length := len(backend.List())
-			for i, fileName := range backend.List() {
-				println(length-i, "-", fileName)
-			}
-		case "googledrive":
+			fileNames = backend.List()
+		case "google_drive":
+			jsonCredentialPath, _ := backendConfig["json_credential"].(string)
 			backend := new(googledrive.BackendGoogleDrive)
-			backend.Init(location.Path)
+			backend.Init(location.Path, jsonCredentialPath)
+			fileNames = backend.List()
 		default:
 			utils.LoggerError(fmt.Sprintf(
 				"Backend \"%s\" is not implemented yet :'(",
 				location.Backend,
 			))
+		}
+
+		println("files...")
+		fileNamesLen = len(fileNames)
+		for i, fileName := range fileNames {
+			utils.LoggerSuccess(fmt.Sprintf("%d - %s", fileNamesLen-i, fileName))
 		}
 	},
 }
