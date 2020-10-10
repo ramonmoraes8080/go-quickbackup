@@ -97,7 +97,7 @@ to quickly create a Cobra application.`,
 
 		case "googledrive":
 			backend := new(googledrive.BackendGoogleDrive)
-			backend.Init(location.Path)
+			backend.Init(location.Path, "")
 		default:
 			utils.LoggerError(fmt.Sprintf(
 				"Backend \"%s\" is not implemented yet :'(",
