@@ -16,20 +16,40 @@ limitations under the License.
 package googledrive
 
 import (
+	gdrive_svc "gitlab.com/velvetkeyboard/go-quickbackup/services/googledrive"
 	"gitlab.com/velvetkeyboard/go-quickbackup/utils"
 )
 
 type BackendGoogleDrive struct {
-	Path string
+	Path           string
+	ConfigPath     string
+	GoogleDriveSvc *gdrive_svc.GoogleDrive
 }
 
-func (b *BackendGoogleDrive) Init(path string) {
+func (b *BackendGoogleDrive) Init(path string, configPath string) {
 	b.Path = utils.ExpandUser(path)
+	b.ConfigPath = utils.ExpandUser(configPath)
+	b.GoogleDriveSvc = new(gdrive_svc.GoogleDrive)
+	b.GoogleDriveSvc.Init(b.ConfigPath)
 }
 
 func (b *BackendGoogleDrive) Upload(zipFilePath string) {
 }
 
-// Copy file zip to an arbitrary path
 func (b *BackendGoogleDrive) Download(zipFileName string, dest string) {
+	zipFileNameID := b.GoogleDriveSvc.GetFileId(zipFileName)
+	println("zipFileNameID", zipFileNameID)
+	b.GoogleDriveSvc.DownloadFile(zipFileNameID)
+}
+
+func (b *BackendGoogleDrive) List() []string {
+	var ret []string
+	if files := b.GoogleDriveSvc.ListFilesFromFolder(b.Path); len(files) > 0 {
+		for _, file := range files {
+			ret = append(ret, file.Name)
+			b.Download(file.Name, "/foo/bar")
+			break
+		}
+	}
+	return ret
 }
