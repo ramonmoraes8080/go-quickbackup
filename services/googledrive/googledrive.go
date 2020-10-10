@@ -131,7 +131,7 @@ func (gd *GoogleDrive) DownloadFile(fileId string) {
 		println(err)
 	}
 
-	println(string(bodyBytes))
+	println(string(bodyBytes)) // TODO persist bodyBytes to a file, pls!
 }
 
 // Helpers to initialize drive.Service struct ----------------------------------
