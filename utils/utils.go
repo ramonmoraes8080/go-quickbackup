@@ -15,6 +15,8 @@ limitations under the License.
 */
 package utils
 
+// TODO Too much functions here. BREAK IT DOWN
+
 import (
 	"errors"
 	"fmt"
