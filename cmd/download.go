@@ -74,35 +74,61 @@ to quickly create a Cobra application.`,
 
 		location := config.Locations[locationName]
 
+		var backendConfig map[interface{}]interface{}
+		if "filesystem" != location.Backend {
+			// Go is not clever enough to resolve this one for me...
+			backendConfig = config.Backends[location.Backend].(map[interface{}]interface{})
+		}
+
+		var fileNamesLen int
+		var fileNames []string
+
 		switch location.Backend {
 		case "filesystem":
 			backend := new(local.BackendLocalFilesystem)
 			backend.Init(location.Path)
-			fileList := backend.List()
-			length := len(fileList)
-			for i, fileName := range fileList {
-				println(length-i, "-", fileName)
-			}
-			numOption := length - utils.ReadInputInt("\nType Number > ")
-			if numOption < 0 || numOption >= length {
-				utils.LoggerError(fmt.Sprintf("Value is not part of the list"))
-				os.Exit(0)
-			}
+			fileNames = backend.List()
 
-			fileToDownloadName := fileList[numOption]
-			utils.LoggerSuccess(fmt.Sprintf(
-				"Downloading %s ", fileToDownloadName))
-
-			backend.Download(fileToDownloadName, ".")
-
-		case "googledrive":
+		case "google_drive":
+			jsonCredentialPath, _ := backendConfig["json_credential"].(string)
 			backend := new(googledrive.BackendGoogleDrive)
-			backend.Init(location.Path, "")
+			backend.Init(location.Path, jsonCredentialPath)
+			fileNames = backend.List(schemaName)
+
 		default:
 			utils.LoggerError(fmt.Sprintf(
 				"Backend \"%s\" is not implemented yet :'(",
 				location.Backend,
 			))
+			os.Exit(0)
+		}
+
+		fileNamesLen = len(fileNames)
+
+		for i, fileName := range fileNames {
+			utils.LoggerSuccess(fmt.Sprintf(
+				"%d - %s",
+				fileNamesLen-i,
+				fileName,
+			))
+		}
+
+		idx := fileNamesLen - utils.ReadInputInt("\nType Number > ")
+
+		if idx >= fileNamesLen || idx < 0 {
+			utils.LoggerError(fmt.Sprintf("%d is not a valid number\n", idx))
+			os.Exit(0)
+		}
+
+		switch location.Backend {
+		case "filesystem":
+			backend := new(local.BackendLocalFilesystem)
+			backend.Download(fileNames[idx], ".")
+		case "google_drive":
+			jsonCredentialPath, _ := backendConfig["json_credential"].(string)
+			backend := new(googledrive.BackendGoogleDrive)
+			backend.Init(location.Path, jsonCredentialPath)
+			backend.Download(fileNames[idx], ".")
 		}
 	},
 }
