@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// https://gist.github.com/ik5/d8ecde700972d4378d87
 const (
 	SuccessColor = "\033[1;32m%s\033[0m"
 	InfoColor    = "\033[1;34m%s\033[0m"
