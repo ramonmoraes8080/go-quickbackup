@@ -91,22 +91,33 @@ var uploadCmd = &cobra.Command{
 
 		location := config.Locations[locationName]
 
+		var backendConfig map[interface{}]interface{}
+		if "filesystem" != location.Backend {
+			// Go is not clever enough to resolve this one for me...
+			backendConfig = config.Backends[location.Backend].(map[interface{}]interface{})
+		}
+
 		// TODO Add AWS S3 Backend
-		// TODO Add Google Drive Backend
 		switch location.Backend {
 		case "filesystem":
 			backend := new(local.BackendLocalFilesystem)
 			backend.Init(location.Path)
 			backend.Upload(zipFileNameFull)
-		case "googledrive":
+		case "google_drive":
+			jsonCredentialPath, _ := backendConfig["json_credential"].(string)
 			backend := new(googledrive.BackendGoogleDrive)
-			backend.Init(location.Path, "")
+			backend.Init(location.Path, jsonCredentialPath)
+			backend.Upload(zipFileNameFull)
 		default:
 			utils.LoggerError(fmt.Sprintf(
 				"Backend \"%s\" is not implemented yet :'(",
 				location.Backend,
 			))
 		}
+		utils.LoggerSuccess(fmt.Sprintf(
+			"Backup file %v was successfuly uploaded",
+			zipFileNameFull,
+		))
 	},
 }
 
