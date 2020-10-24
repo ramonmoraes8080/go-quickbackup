@@ -3,6 +3,7 @@ package googledrive
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -26,22 +27,19 @@ type GoogleDrive struct {
 }
 
 func (gd *GoogleDrive) Init(jsonConfigPath string) {
-	// gd.Client, _ = drive.New(
-	// 	getOAuth2Client(
-	// 		getConfigFromJSONFile(jsonConfigPath),
-	// 	),
-	// )
 	gd.Client = getService(jsonConfigPath)
 }
 
-func (gd *GoogleDrive) GetEntityId(entityName string, mimeType string, skip_trash bool) string {
+func (gd *GoogleDrive) GetEntityId(
+	entityName string,
+	mimeType string,
+	skip_trash bool,
+) string {
 	query := "name contains '" + entityName + "'"
 	if mimeType != "" {
 		query += " and mimeType = '" + mimeType + "'"
 	}
 	query += " and trashed = " + strconv.FormatBool(!skip_trash) + ""
-
-	println("query", query)
 
 	r, err := gd.Client.Files.List().
 		PageSize(1).
@@ -71,6 +69,7 @@ func (gd *GoogleDrive) GetFileId(fileName string) string {
 }
 
 func (gd *GoogleDrive) ListEntitiesFrom(
+	schemaName string,
 	parentEntityId string,
 	mimeType string,
 	skip_trash bool,
@@ -79,6 +78,7 @@ func (gd *GoogleDrive) ListEntitiesFrom(
 	ret := []*drive.File{}
 	for {
 		query := "'" + parentEntityId + "' in parents"
+		query += " and name contains '" + schemaName + "'"
 		if mimeType != "" {
 			query += " and mimeType = '" + mimeType + "'"
 		}
@@ -112,26 +112,49 @@ func (gd *GoogleDrive) ListEntitiesFrom(
 	return ret
 }
 
-func (gd *GoogleDrive) ListFilesFromFolder(parentFolderName string) []*drive.File {
+func (gd *GoogleDrive) ListFilesFromFolder(schemaName string, parentFolderName string) []*drive.File {
 	parentFolderId := gd.GetFolderId(parentFolderName)
-	return gd.ListEntitiesFrom(parentFolderId, "", true)
+	return gd.ListEntitiesFrom(schemaName, parentFolderId, "", true)
 }
 
-func (gd *GoogleDrive) DownloadFile(fileId string) {
-	r, _ := gd.Client.Files.Get(fileId).Download()
-	// if err != nil {
-	// 	println("err:", err)
-	// } else {
-	// 	fmt.Printf("%v\n", r)
-	// }
-	fmt.Printf("%v\n", r.Body)
+func (gd *GoogleDrive) DownloadFile(fileId string) []byte {
+	r, err := gd.Client.Files.Get(fileId).Download()
+
+	if err != nil {
+		panic(fmt.Sprintf(
+			"Error while trying to download file %s from Google Drive: %s",
+			fileId,
+			err.Error(),
+		))
+	}
+
 	bodyBytes, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
 		println(err)
 	}
 
-	println(string(bodyBytes)) // TODO persist bodyBytes to a file, pls!
+	return bodyBytes
+}
+
+func (gd *GoogleDrive) UploadFile(
+	parentFolderName string,
+	fileName string,
+	fileContent io.Reader,
+) {
+	parentFolderId := gd.GetFolderId(parentFolderName)
+
+	file := &drive.File{
+		MimeType: QUICKBACKUPZIP_MIME_TYPE,
+		Name:     fileName,
+		Parents:  []string{parentFolderId},
+	}
+
+	file, err := gd.Client.Files.Create(file).Media(fileContent).Do()
+
+	if err != nil {
+		panic(fmt.Sprintf("Google Drive API: %v", err))
+	}
 }
 
 // Helpers to initialize drive.Service struct ----------------------------------
