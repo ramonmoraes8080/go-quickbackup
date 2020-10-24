@@ -41,30 +41,42 @@ schemas:
     - /etc/bashrc
 ```
 
-- Backing up config files (`my_configs` schema) to `~/backups` folder
+### Scenarios
+
+- Backing up config files (`my_configs` schema) to my local folder: `~/backups`
 
 `quickbackup upload -s my_configs -l my_backups`
+
 
 - Backing up config files (`my_configs` schema) to the pendrive at `/run/media/johnnymnemonic/my-pendrive/`
 
 `quickbackup upload -s my_configs -l pendrive`
 
+
 - Backing up etc files (`my_etc` schema) to the pendrive at `/run/media/johnnymnemonic/my-pendrive/`
 
 `quickbackup upload -s my_etc -l pendrive`
 
-- Since we defined the `defaults` section we can perform the back of the
-`my_config` to the `~/backups` folder using only:
+
+- Since we defined the `defaults` section we can perform the back of the config
+files (`my_config` schema) to the local folder `~/backups` using only:
 
 `quickbackup upload`
 
-- List all the backups for `fedora` schema uploaded with `my_backups`
+
+- List all `fedora` schema backups uploaded with `my_backups`
 
 `quickbackup list -s fedora -l my_backups`
 
-- Downloading/Recovering backups
+
+- Downloading config files (`my_config` schema) at my local folder `~/backups`
 
 `quickbackup download -s fedora -l my_backups`
+
+This will present you a list of available at the path pointed at my_backups
+**location**. Just type the number of the list you want to download.
+
+(Improvements on the way to select this files are coming...)
 
 
 ## Backends
@@ -72,8 +84,9 @@ schemas:
 | Name             | Upload      | Download    | List        |
 |------------------|-------------|-------------|-------------|
 | Local Filesystem | Implemented | Implemented | Implemented |
-| Google Drive     | Not Yet     | Not Yet     | Not Yet     |
+| Google Drive     | Implemented | Implemented | Implemented |
 | AWS S3           | Not Yet     | Not Yet     | Not Yet     |
+
 
 ## License
 
