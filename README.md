@@ -5,6 +5,19 @@ somewhere using YAML based configuration
 
 ## Install
 
+## Setup Backends
+
+### Google Drive
+
+1. Visit the [Quick Start Page](https://developers.google.com/drive/api/v3/quickstart/go#step_1_turn_on_the)
+2. A `credentials.json` will be downloaded. Move it to `~/.config/quickbackup/googledrive.json`
+3. On the first run of `quickbackup` a link will be shown at the terminal.
+Visit the link and allow the application to have access to your Google Drive
+4. Now `quickbackup` will be able to list, download and upload files normally
+
+All this will guarantee that only you and your instance of `quickbackup` have
+access to your files.
+
 ## Usage
 
 Base YAML config for the examples saved at `~/.quickbackup.yaml`:
