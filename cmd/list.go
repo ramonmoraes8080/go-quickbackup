@@ -94,7 +94,7 @@ to quickly create a Cobra application.`,
 			jsonCredentialPath, _ := backendConfig["json_credential"].(string)
 			backend := new(googledrive.BackendGoogleDrive)
 			backend.Init(location.Path, jsonCredentialPath)
-			fileNames = backend.List()
+			fileNames = backend.List(schemaName)
 		default:
 			utils.LoggerError(fmt.Sprintf(
 				"Backend \"%s\" is not implemented yet :'(",
@@ -102,7 +102,6 @@ to quickly create a Cobra application.`,
 			))
 		}
 
-		println("files...")
 		fileNamesLen = len(fileNames)
 		for i, fileName := range fileNames {
 			utils.LoggerSuccess(fmt.Sprintf("%d - %s", fileNamesLen-i, fileName))
