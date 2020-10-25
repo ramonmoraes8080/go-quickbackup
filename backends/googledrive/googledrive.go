@@ -22,7 +22,7 @@ import (
 	"path/filepath"
 
 	gdrive_svc "gitlab.com/velvetkeyboard/go-quickbackup/services/googledrive"
-	"gitlab.com/velvetkeyboard/go-quickbackup/utils"
+	fs "gitlab.com/velvetkeyboard/go-quickbackup/utils/filesystem"
 )
 
 type BackendGoogleDrive struct {
@@ -32,8 +32,8 @@ type BackendGoogleDrive struct {
 }
 
 func (b *BackendGoogleDrive) Init(path string, configPath string) {
-	b.Path = utils.ExpandUser(path)
-	b.ConfigPath = utils.ExpandUser(configPath)
+	b.Path = fs.ExpandUser(path)
+	b.ConfigPath = fs.ExpandUser(configPath)
 	b.GoogleDriveSvc = new(gdrive_svc.GoogleDrive)
 	b.GoogleDriveSvc.Init(b.ConfigPath)
 }

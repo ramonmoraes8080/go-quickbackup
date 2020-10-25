@@ -22,7 +22,7 @@ import (
 	"regexp"
 
 	"gitlab.com/velvetkeyboard/go-quickbackup/constants"
-	"gitlab.com/velvetkeyboard/go-quickbackup/utils"
+	fs "gitlab.com/velvetkeyboard/go-quickbackup/utils/filesystem"
 )
 
 type BackendLocalFilesystem struct {
@@ -30,17 +30,12 @@ type BackendLocalFilesystem struct {
 }
 
 func (b *BackendLocalFilesystem) Init(path string) {
-	b.Path = utils.ExpandUser(path)
+	b.Path = fs.ExpandUser(path)
 }
 
 func (b *BackendLocalFilesystem) Upload(zipFilePath string) {
 	zipFileName := filepath.Base(zipFilePath)
 	zipNewFilePath := filepath.Join(b.Path, zipFileName)
-	utils.LoggerSuccess(fmt.Sprintf(
-		"[Backend][Filesystem] copying %s to %s",
-		zipFilePath,
-		zipNewFilePath,
-	))
 	err := os.Rename(zipFilePath, zipNewFilePath)
 	if err != nil {
 		panic(err)
@@ -50,7 +45,7 @@ func (b *BackendLocalFilesystem) Upload(zipFilePath string) {
 func (b *BackendLocalFilesystem) List() []string {
 	// TODO Maybe we could present this list grouped by date
 	var ret []string
-	for _, filePath := range utils.WalkDir(b.Path) {
+	for _, filePath := range fs.WalkDir(b.Path) {
 		regexStr := fmt.Sprintf(
 			"%s-\\w+-\\d{4}-\\d{2}-\\d{2}-\\d{6}\\.%s",
 			constants.PREFIX, constants.EXTENSION,
@@ -67,7 +62,7 @@ func (b *BackendLocalFilesystem) Download(zipFilePath string, moveTo string) {
 	// TODO Check if the upload file exists?
 	_, zipFileName := filepath.Split(zipFilePath)
 	// err := os.Rename(zipFilePath, filepath.Join(moveTo, zipFileName))
-	_, err := utils.Copy(zipFilePath, filepath.Join(moveTo, zipFileName))
+	_, err := fs.CopyFile(zipFilePath, filepath.Join(moveTo, zipFileName))
 	if err != nil {
 		panic(err) // TODO Should we panic here?
 	}

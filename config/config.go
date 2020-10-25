@@ -21,7 +21,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 
-	"gitlab.com/velvetkeyboard/go-quickbackup/utils"
+	fs "gitlab.com/velvetkeyboard/go-quickbackup/utils/filesystem"
 )
 
 type ConfigurationBackend struct {
@@ -47,7 +47,7 @@ type Configuration struct {
 }
 
 func (c *Configuration) Init(filePath string) {
-	filePath = utils.ExpandUser(filePath)
+	filePath = fs.ExpandUser(filePath)
 	fileBytes, _ := ioutil.ReadFile(filePath)
 	// c.Backends = make(map[interface{}]interface{})
 	// c.Backends = make(map[string]interface{})

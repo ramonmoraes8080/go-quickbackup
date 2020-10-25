@@ -23,7 +23,9 @@ import (
 	googledrive "gitlab.com/velvetkeyboard/go-quickbackup/backends/googledrive"
 	local "gitlab.com/velvetkeyboard/go-quickbackup/backends/local"
 	"gitlab.com/velvetkeyboard/go-quickbackup/config"
-	"gitlab.com/velvetkeyboard/go-quickbackup/utils"
+	fs "gitlab.com/velvetkeyboard/go-quickbackup/utils/filesystem"
+	"gitlab.com/velvetkeyboard/go-quickbackup/utils/console/input"
+	"gitlab.com/velvetkeyboard/go-quickbackup/utils/console/output"
 )
 
 // downloadCmd represents the download command
@@ -41,8 +43,8 @@ to quickly create a Cobra application.`,
 		locationName, _ := cmd.Flags().GetString("location")
 		configFilePath, _ := cmd.Flags().GetString("config")
 
-		if _, err := utils.CheckFilePath(configFilePath); err != nil {
-			utils.LoggerError(err.Error())
+		if _, err := fs.CheckFilePath(configFilePath); err != nil {
+			output.LoggerError(err.Error())
 			os.Exit(0)
 		}
 
@@ -62,11 +64,11 @@ to quickly create a Cobra application.`,
 		// exists
 
 		if _, err := config.CheckLocationStatus(locationName); err != nil {
-			utils.LoggerError(err.Error())
+			output.LoggerError(err.Error())
 			os.Exit(0)
 		}
 
-		utils.LoggerInfo(fmt.Sprintf(
+		output.LoggerInfo(fmt.Sprintf(
 			"Which \"%s\" schema backup from location \"%s\" you want to download:\n",
 			schemaName,
 			locationName,
@@ -96,7 +98,7 @@ to quickly create a Cobra application.`,
 			fileNames = backend.List(schemaName)
 
 		default:
-			utils.LoggerError(fmt.Sprintf(
+			output.LoggerError(fmt.Sprintf(
 				"Backend \"%s\" is not implemented yet :'(",
 				location.Backend,
 			))
@@ -106,17 +108,17 @@ to quickly create a Cobra application.`,
 		fileNamesLen = len(fileNames)
 
 		for i, fileName := range fileNames {
-			utils.LoggerSuccess(fmt.Sprintf(
+			output.LoggerSuccess(fmt.Sprintf(
 				"%d - %s",
 				fileNamesLen-i,
 				fileName,
 			))
 		}
 
-		idx := fileNamesLen - utils.ReadInputInt("\nType Number > ")
+		idx := fileNamesLen - input.ReadInt("\nType Number > ")
 
 		if idx >= fileNamesLen || idx < 0 {
-			utils.LoggerError(fmt.Sprintf("%d is not a valid number\n", idx))
+			output.LoggerError(fmt.Sprintf("%d is not a valid number\n", idx))
 			os.Exit(0)
 		}
 

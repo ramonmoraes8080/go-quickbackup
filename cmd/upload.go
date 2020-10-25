@@ -26,7 +26,9 @@ import (
 	local "gitlab.com/velvetkeyboard/go-quickbackup/backends/local"
 	"gitlab.com/velvetkeyboard/go-quickbackup/config"
 	"gitlab.com/velvetkeyboard/go-quickbackup/schema"
-	"gitlab.com/velvetkeyboard/go-quickbackup/utils"
+	fs "gitlab.com/velvetkeyboard/go-quickbackup/utils/filesystem"
+	"gitlab.com/velvetkeyboard/go-quickbackup/utils/datetime"
+	"gitlab.com/velvetkeyboard/go-quickbackup/utils/console/output"
 	"gitlab.com/velvetkeyboard/go-quickbackup/zipfile"
 )
 
@@ -40,8 +42,8 @@ var uploadCmd = &cobra.Command{
 		locationName, _ := cmd.Flags().GetString("location")
 		configFilePath, _ := cmd.Flags().GetString("config")
 
-		if _, err := utils.CheckFilePath(configFilePath); err != nil {
-			utils.LoggerError(err.Error())
+		if _, err := fs.CheckFilePath(configFilePath); err != nil {
+			output.LoggerError(err.Error())
 			os.Exit(0)
 		}
 
@@ -61,11 +63,11 @@ var uploadCmd = &cobra.Command{
 		// exists
 
 		if _, err := config.CheckLocationStatus(locationName); err != nil {
-			utils.LoggerError(err.Error())
+			output.LoggerError(err.Error())
 			os.Exit(0)
 		}
 
-		utils.LoggerInfo(fmt.Sprintf(
+		output.LoggerInfo(fmt.Sprintf(
 			"Backing up \"%s\" schema to the location set \"%s\"",
 			schemaName,
 			locationName,
@@ -75,14 +77,14 @@ var uploadCmd = &cobra.Command{
 		schema.Init(config, schemaName)
 
 		// TODO Might be interesting creating the backup on the /tmp
-		currTimeStr := utils.GetCurrentISOTimeString()
+		currTimeStr := datetime.GetCurrentISOTimeString()
 		zipFileTitle := "quickbackup-" + schemaName + "-" + currTimeStr
 		zipFileNameFull := zipFileTitle + ".zip"
 
 		zfile := new(zipfile.ZipFile)
 		zfile.Init(zipFileNameFull)
 		for _, path := range schema.Files {
-			utils.LoggerInfo(fmt.Sprintf("[Zipping] %s", path))
+			output.LoggerInfo(fmt.Sprintf("[Zipping] %s", path))
 			fileContentBytes, _ := ioutil.ReadFile(path)
 			zfile.AppendBytes(zipFileTitle+path, fileContentBytes)
 		}
@@ -109,12 +111,12 @@ var uploadCmd = &cobra.Command{
 			backend.Init(location.Path, jsonCredentialPath)
 			backend.Upload(zipFileNameFull)
 		default:
-			utils.LoggerError(fmt.Sprintf(
+			output.LoggerError(fmt.Sprintf(
 				"Backend \"%s\" is not implemented yet :'(",
 				location.Backend,
 			))
 		}
-		utils.LoggerSuccess(fmt.Sprintf(
+		output.LoggerSuccess(fmt.Sprintf(
 			"Backup file %v was successfuly uploaded",
 			zipFileNameFull,
 		))

@@ -17,7 +17,7 @@ package schema
 
 import (
 	"gitlab.com/velvetkeyboard/go-quickbackup/config"
-	"gitlab.com/velvetkeyboard/go-quickbackup/utils"
+	fs "gitlab.com/velvetkeyboard/go-quickbackup/utils/filesystem"
 )
 
 type Schema struct {
@@ -27,5 +27,5 @@ type Schema struct {
 
 func (s *Schema) Init(cfg *config.Configuration, schemaName string) {
 	s.Name = schemaName
-	s.Files = utils.WalkDirs(cfg.Schemas[schemaName])
+	s.Files = fs.WalkDirs(cfg.Schemas[schemaName])
 }
